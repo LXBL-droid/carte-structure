@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La carte de structure de votre manuscrit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F3EFE9;--sheet:#FBF9F6;--ink:#2B2622;--taupe:#7C7065;--line:#DDD5CA;--brass:#9C7A34;--serif:"Source Serif 4",Georgia,"Times New Roman",serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:17px;line-height:1.55;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.wrap{max-width:980px;margin:0 auto;padding:40px 24px 32px}
+h1{font-size:clamp(30px,4.6vw,42px);line-height:1.1;margin:0 0 14px}
+h2{font-size:24px;margin:0 0 6px}
+.lede{color:var(--taupe);font-size:18px;margin:0 0 8px}
+.how{font-size:15px;color:var(--taupe);margin:0 0 22px}
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:6px;padding:20px 22px;margin:0 0 18px}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:15px}
+th{font-weight:600;text-align:left;color:var(--taupe);font-size:13.5px;padding:6px 6px;border-bottom:1px solid var(--line)}
+td{padding:4px 4px;border-bottom:1px solid var(--line);vertical-align:middle}
+td.num{width:36px;color:var(--taupe);text-align:center}
+input[type=text],input[type=number],select{width:100%;font:inherit;font-size:15px;border:1px solid var(--line);border-radius:4px;padding:5px 7px;background:#fff;color:var(--ink)}
+input[type=number]{max-width:110px}
+select{max-width:90px}
+.del{font:inherit;border:0;background:none;color:#9A4A3A;cursor:pointer;font-size:18px}
+.btn{font:inherit;font-size:15.5px;border-radius:4px;padding:8px 15px;cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:#fff}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.hint{font-size:14px;color:var(--taupe);margin:8px 0 0}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.chart{width:100%;overflow-x:auto}
+.chart svg{display:block}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:14px;color:var(--taupe);margin:6px 0 0}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:2px}
+.obs{margin:0;padding-left:20px}
+.obs li{margin:0 0 8px}
+.note{font-size:15px;color:var(--taupe)}
+.cta{background:var(--ink);color:#fff;border-radius:6px;padding:20px 22px;margin-top:6px}
+.cta p{margin:0 0 10px;color:#E8E1D6}
+.cta a{color:#fff;font-weight:600}
+footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);font-size:14px;color:var(--taupe)}
+footer a{color:var(--brass)}
+.copy{font-size:12.5px}
+@media print{.noprint{display:none!important}body{background:#fff}.card{border:0;padding:0}.cta{background:#fff;color:#000;border:1px solid #000}.cta p,.cta a{color:#000}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>La carte de structure de votre manuscrit</h1>
+  <p class="lede">Décrivez chaque chapitre en une ligne : l'outil dessine la forme de votre livre, et relève ce qui mérite un second regard.</p>
+  <p class="how">Comptez une demi-heure pour un roman. La carte ne juge rien : elle fait voir la longueur des chapitres, la place des points de vue et la courbe de la tension, telles que vous les percevez. Vos données restent dans votre navigateur ; rien n'est transmis.</p>
+</header>
+
+<section class="card noprint" id="saisie">
+  <h2>Vos chapitres</h2>
+  <p class="note">Une ligne par chapitre. La longueur peut être en mots ou en pages, du moment que vous gardez la même unité. La tension est votre estimation, de 1 (calme) à 5 (très forte).</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>N°</th><th>Titre ou repère</th><th>Longueur</th><th>Point de vue</th><th>Événement principal, en une phrase</th><th>Tension</th><th></th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+  <datalist id="pdv"></datalist>
+  <div class="btns">
+    <button class="btn" type="button" id="add">Ajouter un chapitre</button>
+    <button class="btn ghost" type="button" id="example">Voir un exemple</button>
+    <button class="btn ghost" type="button" id="clear">Tout effacer</button>
+    <button class="btn ghost" type="button" id="exp">Enregistrer (fichier)</button>
+    <button class="btn ghost" type="button" id="imp">Ouvrir un fichier</button>
+    <input type="file" id="file" accept="application/json" hidden>
+  </div>
+  <p class="hint">Votre saisie est conservée dans ce navigateur. Pour la garder ailleurs ou la reprendre sur un autre appareil, enregistrez-la dans un fichier.</p>
+  <div class="btns"><button class="btn" type="button" id="draw">Dessiner la carte</button></div>
+</section>
+
+<section id="carte" hidden>
+  <div class="card">
+    <h2>La forme de votre livre</h2>
+    <p class="note" id="resume"></p>
+    <h3>La longueur des chapitres</h3>
+    <div class="chart" id="c-long"></div>
+    <h3>Les points de vue</h3>
+    <div class="chart" id="c-pdv"></div>
+    <div class="legend" id="leg"></div>
+    <h3>La tension</h3>
+    <div class="chart" id="c-tens"></div>
+  </div>
+  <div class="card">
+    <h2>Ce que montre la carte</h2>
+    <ul class="obs" id="obs"></ul>
+    <p class="note">Ces relevés décrivent votre livre, ils ne le jugent pas. Un chapitre très long, un personnage absent pendant un tiers du récit ou une tension qui reste au même niveau peuvent être de vrais choix. Seule la lecture du texte permet de dire s'ils servent le livre.</p>
+  </div>
+  <div class="cta">
+    <p>Le diagnostic de manuscrit répond précisément à cette question : ce qui, dans la construction de votre livre, sert la lecture et ce qui la freine. Vous pouvez joindre cette carte, imprimée, à votre demande.</p>
+    <a href="https://www.ecrivain-service.fr/diagnostic-de-manuscrit" target="_blank" rel="noopener">Découvrir le diagnostic de manuscrit</a>
+  </div>
+  <div class="btns noprint"><button class="btn ghost" type="button" id="back">Revenir à la saisie</button><button class="btn" type="button" id="print">Imprimer la carte</button></div>
+</section>
+
+<footer>
+  <p>D'autres outils gratuits pour écrire, réviser et publier sur la page <a href="https://www.ecrivain-service.fr/ressources" target="_blank" rel="noopener">Ressources</a>.</p>
+  <p class="copy">© 2026 Louis-Xavier Babin-Lachaud — <a href="https://www.ecrivain-service.fr/">ecrivain-service.fr</a>. Partage autorisé tel quel, modification et usage commercial interdits sans accord.</p>
+</footer>
+</div>
+
+<script>
+const KEY = "carteStructure.v1";
+const COLORS = ["#9C7A34","#4F6B4A","#5B6B7C","#9A4A3A","#7C5C8C","#3E7C7C","#B08A3E","#6B6B6B"];
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let rows = [];
+try { rows = JSON.parse(localStorage.getItem(KEY)) || []; } catch(e) { rows = []; }
+if (!rows.length) rows = [blank(), blank(), blank()];
+function blank(){ return {t:"", l:"", p:"", e:"", s:""}; }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(rows)); } catch(e){} }
+
+function renderRows(){
+  $("#rows").innerHTML = rows.map((r,i) =>
+    '<tr><td class="num">'+(i+1)+'</td>'+
+    '<td><input type="text" data-i="'+i+'" data-k="t" value="'+esc(r.t)+'" aria-label="Titre du chapitre '+(i+1)+'"></td>'+
+    '<td><input type="number" min="0" data-i="'+i+'" data-k="l" value="'+esc(r.l)+'" aria-label="Longueur du chapitre '+(i+1)+'"></td>'+
+    '<td><input type="text" list="pdv" data-i="'+i+'" data-k="p" value="'+esc(r.p)+'" aria-label="Point de vue du chapitre '+(i+1)+'"></td>'+
+    '<td><input type="text" data-i="'+i+'" data-k="e" value="'+esc(r.e)+'" aria-label="Événement principal du chapitre '+(i+1)+'"></td>'+
+    '<td><select data-i="'+i+'" data-k="s" aria-label="Tension du chapitre '+(i+1)+'"><option value=""></option>'+[1,2,3,4,5].map(n=>'<option'+(String(r.s)===String(n)?' selected':'')+'>'+n+'</option>').join("")+'</select></td>'+
+    '<td><button class="del" type="button" data-del="'+i+'" title="Supprimer ce chapitre" aria-label="Supprimer le chapitre '+(i+1)+'">×</button></td></tr>').join("");
+  document.querySelectorAll("#rows [data-k]").forEach(el => el.addEventListener("input", () => { rows[+el.dataset.i][el.dataset.k] = el.value; save(); updatePdv(); }));
+  document.querySelectorAll("#rows [data-del]").forEach(b => b.onclick = () => { rows.splice(+b.dataset.del,1); if(!rows.length) rows.push(blank()); save(); renderRows(); });
+  updatePdv();
+}
+function updatePdv(){
+  const set = [...new Set(rows.map(r => r.p.trim()).filter(Boolean))];
+  $("#pdv").innerHTML = set.map(p => '<option value="'+esc(p)+'">').join("");
+}
+$("#add").onclick = () => { rows.push(blank()); save(); renderRows(); const ins = document.querySelectorAll('#rows input[data-k="t"]'); ins[ins.length-1].focus(); };
+$("#clear").onclick = () => { if (confirm("Effacer tous les chapitres ? Enregistrez-les d'abord dans un fichier si vous voulez les garder.")) { rows = [blank(), blank(), blank()]; save(); renderRows(); } };
+$("#example").onclick = () => {
+  if (rows.some(r => r.t || r.l || r.e) && !confirm("Remplacer votre saisie par l'exemple ?")) return;
+  rows = [
+    {t:"L'arrivée",l:"3200",p:"Claire",e:"Claire revient dans la maison de son enfance après la mort de sa mère.",s:"2"},
+    {t:"Les cartons",l:"2900",p:"Claire",e:"Elle découvre une lettre adressée à un inconnu.",s:"3"},
+    {t:"Le notaire",l:"3100",p:"Claire",e:"Le notaire évoque un héritier qu'elle ne connaît pas.",s:"3"},
+    {t:"1983",l:"4100",p:"Hélène",e:"La mère, jeune, rencontre un homme au bal du village.",s:"2"},
+    {t:"Le village",l:"3000",p:"Claire",e:"Les voisins se taisent quand elle parle de la lettre.",s:"3"},
+    {t:"Marc",l:"2800",p:"Claire",e:"Elle retrouve son ami d'enfance, devenu gendarme.",s:"3"},
+    {t:"Les archives",l:"9800",p:"Claire",e:"Recherches à la mairie, longues descriptions des registres.",s:"3"},
+    {t:"Le carnet",l:"3300",p:"Claire",e:"Un carnet de sa mère révèle un enfant né en 1984.",s:"3"},
+    {t:"La ferme",l:"2700",p:"Claire",e:"Elle trouve la ferme où l'enfant aurait été placé.",s:"3"},
+    {t:"L'aveu",l:"3500",p:"Claire",e:"Le vieux fermier avoue avoir élevé l'enfant.",s:"5"},
+    {t:"Thomas",l:"3000",p:"Claire",e:"Claire rencontre son demi-frère.",s:"4"},
+    {t:"Le départ",l:"2200",p:"Claire",e:"Elle vend la maison et repart.",s:"2"}
+  ];
+  save(); renderRows();
+};
+$("#exp").onclick = () => { const b = new Blob([JSON.stringify(rows,null,1)],{type:"application/json"}); const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = "carte-structure.json"; a.click(); URL.revokeObjectURL(a.href); };
+$("#imp").onclick = () => $("#file").click();
+$("#file").onchange = e => { const f = e.target.files[0]; if(!f) return; const rd = new FileReader(); rd.onload = () => { try { const d = JSON.parse(rd.result); if (Array.isArray(d)) { rows = d.map(r => ({t:r.t||"",l:r.l||"",p:r.p||"",e:r.e||"",s:r.s||""})); save(); renderRows(); } } catch(err){ alert("Ce fichier n'a pas pu être lu."); } }; rd.readAsText(f); e.target.value=""; };
+
+function median(a){ const s=[...a].sort((x,y)=>x-y); const m=Math.floor(s.length/2); return s.length%2?s[m]:(s[m-1]+s[m])/2; }
+function de(p){ return /^[aeiouyhàâéèêëîïôöûüAEIOUYHÀÂÉÈÊËÎÏÔÖÛÜ]/.test(p) ? "d'"+p : "de "+p; }
+function list(nums){ if(nums.length===1) return "le chapitre "+nums[0]; return "les chapitres "+nums.slice(0,-1).join(", ")+" et "+nums[nums.length-1]; }
+
+function draw(){
+  const data = rows.map((r,i) => ({n:i+1, t:r.t.trim(), l:parseFloat(r.l)||0, p:r.p.trim(), e:r.e.trim(), s:parseInt(r.s)||0}))
+                   .filter(d => d.t || d.l || d.p || d.e || d.s);
+  if (data.length < 3) { alert("Renseignez au moins trois chapitres pour dessiner la carte."); return; }
+  data.forEach((d,i) => d.n = i+1);
+  const N = data.length, W = Math.max(640, N*34 + 60), H = 170, pad = 40, bw = (W - pad - 10)/N;
+  const total = data.reduce((a,d)=>a+d.l,0);
+  const pdvs = [...new Set(data.map(d=>d.p).filter(Boolean))];
+  const col = p => COLORS[pdvs.indexOf(p) % COLORS.length] || "#BBB";
+  $("#resume").textContent = N+" chapitres"+(total?", longueur totale de "+total.toLocaleString("fr-FR"):"")+(pdvs.length?", "+pdvs.length+" point"+(pdvs.length>1?"s":"")+" de vue":"")+".";
+
+  // Longueur
+  const maxL = Math.max(...data.map(d=>d.l),1);
+  let s = '<svg width="'+W+'" height="'+(H+24)+'" role="img" aria-label="Longueur des chapitres">';
+  data.forEach((d,i) => { const h = d.l/maxL*(H-20); const x = pad + i*bw;
+    s += '<rect x="'+(x+3)+'" y="'+(H-h)+'" width="'+Math.max(bw-6,2)+'" height="'+h+'" fill="'+(d.p?col(d.p):"#9C7A34")+'" opacity=".85"><title>Chapitre '+d.n+(d.t?" : "+esc(d.t):"")+" ("+d.l+")</title></rect>";
+    s += '<text x="'+(x+bw/2)+'" y="'+(H+16)+'" font-size="11" text-anchor="middle" fill="#7C7065">'+d.n+'</text>'; });
+  s += '<line x1="'+pad+'" y1="'+H+'" x2="'+(W-10)+'" y2="'+H+'" stroke="#DDD5CA"/></svg>';
+  $("#c-long").innerHTML = s;
+
+  // Points de vue
+  s = '<svg width="'+W+'" height="'+(pdvs.length*22+30)+'" role="img" aria-label="Points de vue par chapitre">';
+  pdvs.forEach((p,j) => { const y = 6 + j*22;
+    s += '<text x="0" y="'+(y+13)+'" font-size="12" fill="#2B2622">'+esc(p.length>7?p.slice(0,6)+"…":p)+'</text>';
+    data.forEach((d,i) => { if (d.p===p) s += '<rect x="'+(pad+i*bw+3)+'" y="'+y+'" width="'+Math.max(bw-6,2)+'" height="16" rx="2" fill="'+col(p)+'"><title>Chapitre '+d.n+' : '+esc(p)+'</title></rect>'; }); });
+  data.forEach((d,i) => s += '<text x="'+(pad+i*bw+bw/2)+'" y="'+(pdvs.length*22+22)+'" font-size="11" text-anchor="middle" fill="#7C7065">'+d.n+'</text>');
+  s += '</svg>';
+  $("#c-pdv").innerHTML = pdvs.length ? s : '<p class="note">Aucun point de vue renseigné.</p>';
+  $("#leg").innerHTML = pdvs.map(p => '<span><i style="background:'+col(p)+'"></i>'+esc(p)+'</span>').join("");
+
+  // Tension
+  const pts = data.map((d,i) => ({x: pad + i*bw + bw/2, y: d.s ? H - (d.s/5)*(H-20) : null, d}));
+  s = '<svg width="'+W+'" height="'+(H+24)+'" role="img" aria-label="Courbe de tension">';
+  for (let k=1;k<=5;k++){ const y = H - (k/5)*(H-20); s += '<line x1="'+pad+'" y1="'+y+'" x2="'+(W-10)+'" y2="'+y+'" stroke="#EEE7DD"/><text x="'+(pad-8)+'" y="'+(y+4)+'" font-size="11" text-anchor="end" fill="#7C7065">'+k+'</text>'; }
+  const valid = pts.filter(p => p.y !== null);
+  if (valid.length > 1) s += '<polyline fill="none" stroke="#2B2622" stroke-width="2" points="'+valid.map(p=>p.x+","+p.y).join(" ")+'"/>';
+  valid.forEach(p => s += '<circle cx="'+p.x+'" cy="'+p.y+'" r="4" fill="#9C7A34"><title>Chapitre '+p.d.n+' : tension '+p.d.s+'</title></circle>');
+  pts.forEach(p => s += '<text x="'+p.x+'" y="'+(H+16)+'" font-size="11" text-anchor="middle" fill="#7C7065">'+p.d.n+'</text>');
+  s += '</svg>';
+  $("#c-tens").innerHTML = valid.length ? s : '<p class="note">Aucune tension renseignée.</p>';
+
+  // Observations
+  const obs = [];
+  const longs = data.filter(d=>d.l>0);
+  if (longs.length >= 4) {
+    const m = median(longs.map(d=>d.l));
+    const big = longs.filter(d => d.l >= 2*m).map(d=>d.n), small = longs.filter(d => d.l <= m/2).map(d=>d.n);
+    if (big.length) obs.push((big.length>1?"Les chapitres "+big.join(", ")+" sont":"Le chapitre "+big[0]+" est")+" au moins deux fois plus long"+(big.length>1?"s":"")+" que la longueur habituelle de vos chapitres.");
+    if (small.length) obs.push((small.length>1?"Les chapitres "+small.join(", ")+" font":"Le chapitre "+small[0]+" fait")+" moins de la moitié de la longueur habituelle de vos chapitres.");
+  }
+  pdvs.forEach(p => {
+    const idx = data.filter(d=>d.p===p).map(d=>d.n);
+    if (idx.length >= 2) {
+      let gap = 0, from = 0;
+      for (let k=1;k<idx.length;k++){ const g = idx[k]-idx[k-1]-1; if (g>gap){gap=g; from=idx[k-1];} }
+      if (gap >= Math.max(4, Math.round(N/4))) obs.push("Le point de vue "+de(p)+" disparaît pendant "+gap+" chapitres consécutifs, du chapitre "+(from+1)+" au chapitre "+(from+gap)+".");
+    }
+    if (idx.length === 1 && pdvs.length > 1) obs.push("Le point de vue "+de(p)+" n'apparaît que dans le chapitre "+idx[0]+".");
+  });
+  const t = data.filter(d=>d.s>0);
+  if (t.length >= 4) {
+    let run = 1, best = 1, end = t[0].n;
+    for (let k=1;k<data.length;k++){ if (data[k].s && data[k].s===data[k-1].s){ run++; if(run>best){best=run; end=data[k].n;} } else run=1; }
+    if (best >= 4) obs.push("La tension reste au même niveau pendant "+best+" chapitres consécutifs, du chapitre "+(end-best+1)+" au chapitre "+end+".");
+    const max = Math.max(...t.map(d=>d.s)); const peaks = t.filter(d=>d.s===max).map(d=>d.n);
+    const tiers = Math.ceil(N*2/3);
+    if (peaks[peaks.length-1] <= Math.floor(N/3)) obs.push("La tension la plus forte de votre estimation se situe dans le premier tiers du livre ("+list(peaks)+").");
+    else if (peaks.every(n => n < tiers)) obs.push("La tension la plus forte de votre estimation se situe avant le dernier tiers du livre ("+list(peaks)+").");
+    const third = Math.floor(N/3);
+    if (third >= 2) {
+      const avg = arr => { const v = arr.filter(d=>d.s>0).map(d=>d.s); return v.length ? v.reduce((a,b)=>a+b,0)/v.length : null; };
+      const a2 = avg(data.slice(third, 2*third)), a3 = avg(data.slice(2*third));
+      if (a2 && a3 && a3 < a2) obs.push("La tension moyenne du dernier tiers est inférieure à celle du deuxième tiers.");
+    }
+  }
+  const sansEv = data.filter(d=>!d.e).map(d=>d.n);
+  if (sansEv.length) obs.push("Vous n'avez pas résumé d'événement principal pour "+list(sansEv)+". Un chapitre difficile à résumer en une phrase mérite souvent d'être relu.");
+  $("#obs").innerHTML = obs.length ? obs.map(o=>'<li>'+esc(o)+'</li>').join("") : '<li>Rien de marquant dans les longueurs, les points de vue et la tension que vous avez indiqués.</li>';
+
+  $("#saisie").hidden = true; $("#carte").hidden = false; window.scrollTo({top:0, behavior:"smooth"});
+}
+$("#draw").onclick = draw;
+$("#back").onclick = () => { $("#carte").hidden = true; $("#saisie").hidden = false; window.scrollTo({top:0, behavior:"smooth"}); };
+$("#print").onclick = () => window.print();
+renderRows();
+</script>
+</body>
+</html>
